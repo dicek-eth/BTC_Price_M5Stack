@@ -11,7 +11,7 @@
 #include <WiFiGeneric.h>
 #include <jsmn.h>
 #include <M5Stack.h>
-WiFiMulti WiFiMulti;
+WiFiMulti wifiMulti;
 
 int status = WL_IDLE_STATUS;
 int lastPrice = 0;
@@ -38,14 +38,14 @@ Api_Str gas_str; //Gas用
 
 // the setup routine runs once when M5Stack starts up
 void setup(){
-  WiFiMulti.addAP("xxxxxxxxx", "xxxxxxxxxxx"); //Wifi名、パスワードを記載する
+  wifiMulti.addAP("xxxxxxxxx", "xxxxxxxxxxx"); //Wifi名、パスワードを記載する
 
   // Initialize the M5Stack object
   M5.begin();
   // LCD display
   M5.Lcd.println("Please wait...");
 
-  while (WiFiMulti.run() != WL_CONNECTED) {
+  while (wifiMulti.run() != WL_CONNECTED) {
     delay(500);
     M5.Lcd.printf(".");
   }
@@ -156,7 +156,7 @@ void jsontrim_gas( Api_Str *t ){
 
 // the loop routine runs over and over again forever
 void loop() {
-  if (client_btc.available() | client_eth.available() | client_gas.available()) {
+  if (client_btc.available() || client_eth.available() || client_gas.available()) {
     String c = client_btc.readString();
     answer += c; //BTC価格格納用変数
     eth_str.str = client_eth.readString(); //ETH価格格納用構造体
@@ -169,8 +169,8 @@ void loop() {
     ConnectToClient_gas();
   }
   // if the server's disconnected, stop the client:
-  if (!client_btc.connected() | !client_eth.connected() | !client_gas.connected()) {
-    m5.update();
+  if (!client_btc.connected() || !client_eth.connected() || !client_gas.connected()) {
+    M5.update();
     client_btc.stop();
     client_eth.stop();    
     client_gas.stop();
@@ -224,42 +224,42 @@ void loop() {
 
     //Display表示
     //BTC price 
-    m5.Lcd.fillScreen(0x0000);
-    m5.Lcd.setFont(&FreeSans9pt7b);
-    m5.Lcd.setTextColor(WHITE);
-    m5.Lcd.setCursor(60, 55);
-    m5.Lcd.setFont(&FreeMonoBold18pt7b);
-    m5.Lcd.printf("BTC ");
-    m5.Lcd.printf(Amount.c_str());
+    M5.Lcd.fillScreen(0x0000);
+    M5.Lcd.setFont(&FreeSans9pt7b);
+    M5.Lcd.setTextColor(WHITE);
+    M5.Lcd.setCursor(60, 55);
+    M5.Lcd.setFont(&FreeMonoBold18pt7b);
+    M5.Lcd.printf("BTC ");
+    M5.Lcd.printf(Amount.c_str());
     //ETH price
-    m5.Lcd.setCursor(60, 105);
-    m5.Lcd.setFont(&FreeMonoBold18pt7b);
-    m5.Lcd.printf("ETH  ");
-    m5.Lcd.printf(eth_str.amount_str.c_str());
+    M5.Lcd.setCursor(60, 105);
+    M5.Lcd.setFont(&FreeMonoBold18pt7b);
+    M5.Lcd.printf("ETH  ");
+    M5.Lcd.printf(eth_str.amount_str.c_str());
     //Gas Value
-    m5.Lcd.setCursor(75, 145);    
-    m5.Lcd.setFont(&FreeMonoBold12pt7b);
-    m5.Lcd.printf("Gas Low : ");     
-    m5.Lcd.printf(Gas_safe.c_str());          
-    m5.Lcd.setCursor(75, 175);  
-    m5.Lcd.printf("Gas Ave : ");  
-    m5.Lcd.printf(Gas_ave.c_str());    
-    m5.Lcd.setCursor(75, 205);  
-    m5.Lcd.printf("Gas Fast: ");  
-    m5.Lcd.printf(Gas_fast.c_str());    
+    M5.Lcd.setCursor(75, 145);
+    M5.Lcd.setFont(&FreeMonoBold12pt7b);
+    M5.Lcd.printf("Gas Low : ");
+    M5.Lcd.printf(Gas_safe.c_str());
+    M5.Lcd.setCursor(75, 175);
+    M5.Lcd.printf("Gas Ave : ");
+    M5.Lcd.printf(Gas_ave.c_str());
+    M5.Lcd.setCursor(75, 205);
+    M5.Lcd.printf("Gas Fast: ");
+    M5.Lcd.printf(Gas_fast.c_str());
 
     // wait 60 seconds and key check
     for (int i = 0; i < 60; i++){
       if(M5.BtnA.wasPressed()) {
-        m5.lcd.setBrightness(0);
+        M5.Lcd.setBrightness(0);
       }
       if(M5.BtnB.wasPressed()) {
-        m5.lcd.setBrightness(25);
+        M5.Lcd.setBrightness(25);
       }
       if(M5.BtnC.wasPressed()) {
-        m5.lcd.setBrightness(150);
+        M5.Lcd.setBrightness(150);
       }
-      m5.update();
+      M5.update();
       delay(1000);
     }
     answer = "";
